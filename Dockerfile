@@ -36,7 +36,7 @@ RUN python3 setup_environment.py \
     rm -rf /temp
 
 # Load environment variables for runtime
-ENV $(cat /root/environment.env | grep -v '^#' | xargs)
+ENV $(cat /root/.env | grep -v '^#' | xargs)
 
 WORKDIR /worker-infinity-embedding
 
