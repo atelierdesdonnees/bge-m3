@@ -9,7 +9,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y \
     git \
-    wget
+    wget \
+    python3 \
+    python3-pip
 
 # Import HF token
 RUN --mount=type=secret,id=HF_TOKEN,required=false \
@@ -30,12 +32,12 @@ RUN python3 setup_environment.py \
     --cuda-version ${CUDA_VERSION} \
     --src-dir ./src \
     --env-file ./environment.env \
-    --requirements-file ./requirements.txt && \
+    --requirements-file ./additional-requirements.txt && \
     rm -rf /temp
 
 # Load environment variables for runtime
 ENV $(cat /root/environment.env | grep -v '^#' | xargs)
 
-WORKDIR /worker-vllm
+WORKDIR /worker-infinity-embedding
 
 CMD ["python3", "src/handler.py"]
