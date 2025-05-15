@@ -35,9 +35,7 @@ RUN python3 setup_environment.py \
     --requirements-file ./additional-requirements.txt && \
     rm -rf /temp
 
-# Load environment variables for runtime
-ENV $(cat /root/.env | grep -v '^#' | xargs)
-
 WORKDIR /worker-infinity-embedding
 
-CMD ["python3", "src/handler.py"]
+# Charger les variables d'environnement au démarrage
+CMD ["/bin/bash", "-c", "if [ -f /root/.env ]; then export $(cat /root/.env | grep -v '^#' | xargs); fi && python3 src/handler.py"]
