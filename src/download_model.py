@@ -1,9 +1,6 @@
 import os
-import re
-import json
 import logging
 import glob
-import time
 from huggingface_hub import snapshot_download
 from utils import timer_decorator
 
@@ -33,10 +30,15 @@ def download(name, revision, type, cache_dir):
             try:
                 logging.info(f"starting download of mode {name} with pattern {pattern_set}")
                 path = snapshot_download(name, revision=revision, cache_dir=cache_dir, allow_patterns=pattern_set)
+                success = True
                 for pattern in pattern_set:
                     if glob.glob(os.path.join(path, pattern)):
                         logging.info(f"Successfully downloaded {pattern} model files.")
-                return path
+                    else:
+                        success = False
+                        logging.info(f"Pattern {pattern} not found in {path}.")
+                if success:
+                    return path
             except RuntimeError as e:
                 logging.info("Une erreur de runtime est survenue.")
                 if "HF_HUB_ENABLE_HF_TRANSFER" in str(e) and os.getenv("HF_HUB_ENABLE_HF_TRANSFER"):
@@ -54,21 +56,24 @@ def download(name, revision, type, cache_dir):
 
 
 def __call__():
-    cache_dir = os.getenv("HF_HOME")
-    model_name, model_revision = os.getenv("MODEL_NAME"), os.getenv("MODEL_REVISION") or None
-    logging.info(f"démarrage du téléchargement du modèle: {model_name}")
-    model_path = download(model_name, model_revision, "model", cache_dir)
-    metadata = {
-        "MODEL_NAME": model_path,
-        "MODEL_REVISION": model_revision,
-    }
-
-    for k, v in metadata.items():
+    environment_variables = {}
+    environment_variables.update(os.environ)
+    cache_dir = environment_variables.get("HF_HOME")
+    model_names, model_revisions = environment_variables.get("MODEL_NAMES"), environment_variables.get("MODEL_REVISION") or None
+    model_files = {}
+    for model_name, model_revision in zip(model_names.split(";"), model_revisions.split(";")):
+        logging.info(f"démarrage du téléchargement du modèle: {model_name}")
+        model_path = download(model_name, model_revision, "model", cache_dir)
+        if "MODEL_PATHS" not in model_files:
+            model_files["MODEL_PATHS"] = f"{model_path};"
+        else:
+            model_files["MODEL_PATHS"] += f"{model_path};"
+    for k, v in model_files.items():
         if v not in (None, ""):
-            os.setenv(k, v)
-
-    # with open(f"{BASE_DIR}/local_model_args.json", "w") as f:
-    #     json.dump({k: v for k, v in metadata.items() if v not in (None, "")}, f)
+            environment_variables[k] = v
+    with open("/root/.env", "w") as f:
+        for k, v in environment_variables.items():
+            f.write(f"{k}={v}\n")
 
 
 if __name__ == "__main__":

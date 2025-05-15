@@ -25,4 +25,4 @@ python3 setup_environment.py \
     --cuda-version "${CUDA_VERSION}" \
     --src-dir ./src \
     --env-file ./environment.env \
-    --requirements-file ./requirements.txt
+    --requirements-file ./additional-requirements.txt

@@ -12,7 +12,7 @@ import subprocess
 import argparse
 import shutil
 from pathlib import Path
-from typing import Dict, List, Optional, Union, NoReturn
+from typing import Dict, Optional, Union, NoReturn
 
 logging.basicConfig(
     level=logging.INFO,
@@ -217,8 +217,8 @@ def copy_files(env_file: Union[str, Path], src_dir: Union[str, Path]) -> None:
 
     # Always ensure environment.env is in /root if provided
     if env_file and Path(env_file).exists():
-        print(f"Copying {env_file} to /root/environment.env")
-        shutil.copy(env_file, "/root/environment.env")
+        print(f"Copying {env_file} to /root/.env")
+        shutil.copy(env_file, "/root/.env")
 
     # Setup base directories and get BASE_PATH
     setup_base_directories()
@@ -252,7 +252,7 @@ def main() -> None:
 
     # Install both sets of requirements
     install_python_packages(
-        worker_infinity_requirements=f"{worker_infinity_path}/builder/requirements.txt",
+        worker_infinity_requirements=f"{worker_infinity_path}/requirements.txt",
         additional_requirements=args.requirements_file,
     )
 
