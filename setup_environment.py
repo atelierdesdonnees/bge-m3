@@ -1,7 +1,7 @@
 """
-Environment setup script for VLLM deployment.
+Environment setup script for infinity embeddings deployment.
 
-This script handles the setup of both Docker and bare server environments for VLLM,
+This script handles the setup of both Docker and bare server environments for infinity embeddings,
 including system packages, Python dependencies, directory structure, and file management.
 """
 
@@ -108,7 +108,7 @@ def install_python_packages(worker_infinity_requirements: Union[str, Path], addi
 
 def setup_infinity_environment(src_dir: Optional[Union[str, Path]] = None) -> Path:
     """
-    Setup VLLM environment and override source files.
+    Setup Infinity Embeddings environment and override source files.
 
     Clones the worker-infinity repository into the parent directory and optionally
     overrides its source files with custom implementations.
@@ -205,7 +205,6 @@ def copy_files(env_file: Union[str, Path], src_dir: Union[str, Path]) -> None:
     Args:
         env_file: Path to environment.env file
         src_dir: Directory containing source files
-        worker_infinity_path: Path to worker-vllm directory
     """
     if isinstance(env_file, str):
         env_file = HERE / env_file
@@ -224,7 +223,7 @@ def copy_files(env_file: Union[str, Path], src_dir: Union[str, Path]) -> None:
     setup_base_directories()
 
 
-def _download_model(src_folder: Path = (Path(__file__).parent / "worker-vllm" / "src")) -> None:
+def _download_model(src_folder: Path = (Path(__file__).parent / "worker-infinity-embedding" / "src")) -> None:
     sys.path.append(str(src_folder))
     from download_model import __call__
 
@@ -232,11 +231,11 @@ def _download_model(src_folder: Path = (Path(__file__).parent / "worker-vllm" / 
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Setup environment for VLLM")
+    parser = argparse.ArgumentParser(description="Setup environment for infinity embedding worker.")
     parser.add_argument("--cuda-version", help="CUDA version (overrides env file)")
     parser.add_argument("--src-dir", help="Directory containing source files", default="./")
     parser.add_argument("--env-file", help="Path to environment.env file", default="environment.env")
-    parser.add_argument("--requirements-file", help="Path to additional requirements.txt file", default="requirements.txt")
+    parser.add_argument("--requirements-file", help="Path to additional requirements.txt file", default="additional-requirements.txt")
 
     args = parser.parse_args()
 
