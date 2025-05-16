@@ -12,9 +12,7 @@ if not os.environ.get("INFINITY_QUEUE_SIZE"):
 
 class EmbeddingServiceConfig:
     def __init__(self):
-        print(f"Loaded environment variables before load_dotenv: {os.environ}")
         load_dotenv()
-        print(f"Loaded environment variables after load_dotenv: {os.environ}")
 
     def _get_no_required_multi(self, name, default=None):
         out = os.getenv(name, f"{default};" * len(self.model_names)).split(";")
